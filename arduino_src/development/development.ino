@@ -8,7 +8,7 @@
 const uint8_t id1=1;
 const uint8_t id2=2;
 int16_t speed=512;
-const long unsigned int baudrate=1000000;
+const long unsigned int baudrate=115200;
 
 SoftwareDynamixelInterface interface_claw(2,3);
 SoftwareDynamixelInterface interface_driver(4,5);
@@ -18,7 +18,7 @@ DynamixelMotor driver_motor(interface_driver, id2);
 
 void setup() {
   // put your setup code here, to run once:
- Serial.begin(9600);
+  Serial.begin(9600);
   interface_claw.begin(baudrate);
   interface_driver.begin(baudrate);
   delay(100);
@@ -27,6 +27,7 @@ void setup() {
   uint8_t status_driver=driver_motor.init();
   if(status_claw!=DYN_STATUS_OK || status_driver!=DYN_STATUS_OK)
   {
+    Serial.println("Failed connection to servo");
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
     while(1);
@@ -57,6 +58,7 @@ void loop() {
         break;
       case 4:
         forward();
+        Serial.println("Forward");
         break;
       default:
         break;
