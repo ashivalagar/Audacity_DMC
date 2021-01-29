@@ -2,8 +2,10 @@
 import serial
 from flask import Flask, request
 import threading
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def serial_logger():
     while True:
@@ -35,10 +37,13 @@ def forward():
     line = ser.readline().decode('utf-8').rstrip()
     return line
 
+@app.route('/test', methods=['GET'])
+def test():
+    return "Live"
+
 if __name__ == "__main__":
     ser = serial.Serial('/dev/ttyACM1', 115200, timeout=1)
     ser.flush()
     flask_thread = threading.Thread(target=app.run(threaded=True))
     flask_thread.start()
-    serial_logger()
     
