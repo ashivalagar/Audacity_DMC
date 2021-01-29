@@ -1,9 +1,17 @@
 #!/usr/bin/env.python3
 import serial
-import time
 from flask import Flask, request
+import threading
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
+def serial_logger():
+    while True:
+        if ser.in_waiting > 0:
+            line = ser.readline().decode('utf-8').rstrip()
+            print(line)
 
 @app.route('/open', methods=['GET'])
 def open():
@@ -23,7 +31,19 @@ def stop():
     line = ser.readline().decode('utf-8').rstrip()
     return line
 
+@app.route('/forward', methods=['GET'])
+def forward():
+    ser.write(b"4")
+    line = ser.readline().decode('utf-8').rstrip()
+    return line
+
+@app.route('/test', methods=['GET'])
+def test():
+    return "Live"
+
 if __name__ == "__main__":
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+    ser = serial.Serial('/dev/ttyACM1', 115200, timeout=1)
     ser.flush()
-    app.run(threaded=True)
+    flask_thread = threading.Thread(target=app.run(threaded=True))
+    flask_thread.start()
+    
